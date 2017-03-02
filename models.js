@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+//-----------------------------------------------******POST SCHEMA******------------------------------------//
+
 const blogPostSchema = mongoose.Schema({
   author: {
     firstName: String,
@@ -24,9 +26,9 @@ blogPostSchema.methods.apiRepr = function() {
     title: this.title,
     created: this.created
   };
-}
+};
 
-
+//-----------------------------------------------******USER SCHEMA******------------------------------------//
 
 const UserSchema = mongoose.Schema({
   username: String,
@@ -53,6 +55,9 @@ UserSchema.methods.apiRepr = function() {
 UserSchema.virtual('realName').get(function() {
   return `${this.firstName} ${this.lastName}`.trim();
 });
+
+
+//-----------------------------------------------******EXPORTS******------------------------------------//
 
 const BlogPost = mongoose.model('BlogPost', blogPostSchema);
 const User = mongoose.model('User', UserSchema);
