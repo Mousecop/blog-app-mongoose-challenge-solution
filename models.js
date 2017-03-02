@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const blogPostSchema = mongoose.Schema({
   author: {
@@ -36,18 +37,18 @@ const UserSchema = mongoose.Schema({
 
 UserSchema.methods.validatePassword = function(password) {
   return bcrypt.compare(password, this.password);
-}
+};
 
-UserSchema.methods.hashPassword = function(password) {
-  return bcrypt.hash(password, 250);
-}
+UserSchema.statics.hashPassword = function(password) {
+  return bcrypt.hash(password, 10);
+};
 
 UserSchema.methods.apiRepr = function() {
   return {
     username: this.username,
     name: this.realName
-  }
-}
+  };
+};
 
 UserSchema.virtual('realName').get(function() {
   return `${this.firstName} ${this.lastName}`.trim();
