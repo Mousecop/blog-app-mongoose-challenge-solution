@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 
 const {DATABASE_URL, PORT} = require('./config');
-const {BlogPost} = require('./models');
+const {BlogPost, User} = require('./models');
 
 const app = express();
 
@@ -111,6 +111,41 @@ app.delete('/:id', (req, res) => {
     });
 });
 
+
+//==========================================User Endpoints====================================//
+
+app.post('/users', (req, res) => {
+  const body = req.body;
+  const { username, firstName, lastName, password} = req.body;
+  if(!("username" in body && "password" in body && "firstName" in body && "lastName" in body)) {
+    res.status(400).json({message: "You are missing something!"});
+  }
+  User
+    .find({username})
+    .count()
+    .exec()
+    .then(count => {
+      if(count > 0) {
+        res.status(400).json({message: "Username already exists"})
+      }
+      return User.hashPassword(password);
+    })
+    .then(hash => {
+     return User.create({ 
+       username: username,
+       password: hash,
+       firstName: firstName,
+       lastName: lastName
+       });
+    })
+    .then(result => {
+      res.status(201).json(result.apiRepr());
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({message: "Your error is this: " + err});
+    });
+});
 
 app.use('*', function(req, res) {
   res.status(404).json({message: 'Not Found'});
