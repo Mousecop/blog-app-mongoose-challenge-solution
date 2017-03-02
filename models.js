@@ -25,6 +25,35 @@ blogPostSchema.methods.apiRepr = function() {
   };
 }
 
-const BlogPost = mongoose.model('BlogPost', blogPostSchema);
 
-module.exports = {BlogPost};
+
+const UserSchema = mongoose.Schema({
+  username: String,
+  password: String,
+  firstName: String,
+  lastName: String
+});
+
+UserSchema.methods.validatePassword = function(password) {
+  return bcrypt.compare(password, this.password);
+}
+
+UserSchema.methods.hashPassword = function(password) {
+  return bcrypt.hash(password, 250);
+}
+
+UserSchema.methods.apiRepr = function() {
+  return {
+    username: this.username,
+    name: this.realName
+  }
+}
+
+UserSchema.virtual('realName').get(function() {
+  return `${this.firstName} ${this.lastName}`.trim();
+});
+
+const BlogPost = mongoose.model('BlogPost', blogPostSchema);
+const User = mongoose.model('User', UserSchema);
+
+module.exports = {BlogPost, User}
